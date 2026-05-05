@@ -110,12 +110,12 @@ function onCard(id) {
   if (!hit) return;
 
   if (S.phase === 'hint') {
-    if (allOppIndexes(S.hintPhase).includes(hit.si) && kind(hit.c.value) === 'number') {
+    if (selfIndexes(S.hintPhase).includes(hit.si) && kind(hit.c.value) === 'number') {
       S.hints[S.hintPhase] = { stand: (hit.si % 2) + 1, value: hit.c.value, id: hit.c.id };
       hit.c.told = true;
       if (S.hintPhase === 0) {
         S.hintPhase = 1;
-        S.overlay = { type: 'swap', nextPlayer: 1, message: `${S.playerNames[1]}さん、相手スタンドから数字カード1枚を選び、相手に伝えてください。` };
+        S.overlay = { type: 'swap', nextPlayer: 1, message: `${S.playerNames[1]}さん、あなたのスタンドから数字カード1枚を選び、相手に伝えてください。` };
       } else {
         S.phase = 'ready';
         S.overlay = { type: 'confirmHints' };
@@ -163,7 +163,7 @@ const actions = {
     S.playerNames = [n1 || 'プレイヤー1', n2 || 'プレイヤー2'];
     deal();
     S.phase = 'hint';
-    S.overlay = { type: 'swap', nextPlayer: 0, message: `${S.playerNames[0]}さん、相手スタンドから数字カード1枚を選び、相手に伝えてください。` };
+    S.overlay = { type: 'swap', nextPlayer: 0, message: `${S.playerNames[0]}さん、あなたのスタンドから数字カード1枚を選び、相手に伝えてください。` };
     render();
   },
   toPlay() { S.phase = 'play'; S.current = 0; S.overlay = { type: 'swap', nextPlayer: 0, message: `${S.playerNames[0]}さん、ゲーム開始です。行動を選択してください。` }; render(); },
@@ -232,7 +232,7 @@ function render() {
   if (S.overlay) {
     const o = document.createElement('div');
     o.className = 'overlay' + (S.overlay.type === 'swap' ? ' blackout' : '');
-    if (S.overlay.type === 'swap') o.innerHTML = `<div class="modal"><div class="big">プレイヤー交代</div><p><b>${S.playerNames[S.overlay.nextPlayer]}のターンです。</b></p><p>${S.overlay.message}</p><button data-action="closeOverlay">OK</button></div>`;
+    if (S.overlay.type === 'swap') o.innerHTML = `<div class="modal"><div class="big">プレイヤー交代</div><p><b>"${S.playerNames[S.overlay.nextPlayer]}さん"のターンです。</b></p><p>${S.overlay.message}</p><button data-action="closeOverlay">OK</button></div>`;
     if (S.overlay.type === 'confirmHints') o.innerHTML = `<div class="modal"><h3>ヒント確認</h3><p>${S.playerNames[0]}→${S.playerNames[1]}: スタンド${S.hints[0].stand}の『${S.hints[0].value}』</p><p>${S.playerNames[1]}→${S.playerNames[0]}: スタンド${S.hints[1].stand}の『${S.hints[1].value}』</p><button data-action="toPlay">ゲーム開始！</button></div>`;
     if (S.overlay.type === 'result') o.innerHTML = `<div class="modal"><div class="big ${S.result.ok ? 'ok' : 'ng'}">${S.result.ok ? '正解！' : '不正解'}</div><p>${S.result.detail}</p><button data-action="closeOverlay">次へ</button></div>`;
     if (S.overlay.type === 'end') o.innerHTML = `<div class="modal"><div class="big ng">${S.overlay.text}</div><button onclick="location.reload()">リトライ</button></div>`;
