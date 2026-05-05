@@ -30,3 +30,5 @@ input{background:#10172d;color:#fff;border:1px solid #3a4572;border-radius:8px;p
 .selected-card{outline:2px solid #4dd2ff;box-shadow:0 0 0 3px #4dd2ff33}
 
 .card.lifted{transform:translateY(-6px)}
+
+.badge.open{left:auto;right:4px;background:#69e0a6;color:#053120}

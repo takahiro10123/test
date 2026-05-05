@@ -117,7 +117,7 @@ function abilityJudge(selfCard, oppCards) {
 function renderCard(c, { hidden, hint = false, told = false, oppOpen = false, selfOpen = false, selectable = false, selected=false, label = '' } = {}) {
   const showHint = hint || !!c.revealedHint;
   const hintLabel = label || c.revealedHint || '';
-  return `<div class="card ${hidden ? 'back' : 'front ' + kind(c.value)} ${oppOpen ? 'open-opponent' : ''} ${selfOpen ? 'open-self' : ''} ${selectable ? 'selectable' : ''} ${selected ? 'selected-card' : ''} ${c.faceUp ? 'lifted' : ''}" data-id="${c.id}">${hidden ? '' : fmt(c.value)}${showHint ? `<span class="badge hint">HINT</span><span class="label">${hintLabel}</span>` : ''}${told ? '<span class="badge">伝</span>' : ''}</div>`;
+  return `<div class="card ${hidden ? 'back' : 'front ' + kind(c.value)} ${oppOpen ? 'open-opponent' : ''} ${selfOpen ? 'open-self' : ''} ${selectable ? 'selectable' : ''} ${selected ? 'selected-card' : ''} ${c.faceUp ? 'lifted' : ''}" data-id="${c.id}">${hidden ? '' : fmt(c.value)}${showHint ? `<span class="badge hint">HINT</span><span class="label">${hintLabel}</span>` : ''}${(c.faceUp||c.openedByMatch)?'<span class="badge open">OPEN</span>':''}${told ? '<span class="badge">伝</span>' : ''}</div>`;
 }
 
 
