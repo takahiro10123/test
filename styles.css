@@ -26,3 +26,5 @@ input{background:#10172d;color:#fff;border:1px solid #3a4572;border-radius:8px;p
 
 .action-btn.active{outline:2px solid #86b7ff;box-shadow:0 0 0 3px #86b7ff33}
 .card.selectable{outline:2px dashed #ffd866;box-shadow:0 0 0 3px #ffd86633}
+
+.selected-card{outline:2px solid #4dd2ff;box-shadow:0 0 0 3px #4dd2ff33}

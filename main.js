@@ -20,6 +20,7 @@ const S = {
   result: null,
   winner: false,
   lose: false,
+  pendingAbilityMiss: null,
 };
 
 const fmt = (v) => (Number.isInteger(v) ? String(v) : v.toFixed(1));
@@ -86,7 +87,7 @@ function normalJudge(selfCard, oppCard) {
   else ok = selfCard.value === oppCard.value;
 
   if (gameOver) { S.lose = true; S.overlay = { type: 'end', text: '赤カードに通常宣言しました。即敗北です。' }; return; }
-  if (ok) { oppCard.faceUp = true; oppCard.openedByMatch = true; } else S.miss += 1;
+  if (ok) { oppCard.faceUp = true; oppCard.openedByMatch = true; } else { S.miss += 1; markMissHint(oppCard);} 
   S.result = { ok, detail: `宣言: ${fmt(selfCard.value)} / 相手: ${fmt(oppCard.value)} / ミス: ${S.miss}` };
   S.overlay = { type: 'result' };
   checkWinLose();
@@ -94,15 +95,33 @@ function normalJudge(selfCard, oppCard) {
 
 function abilityJudge(selfCard, oppCards) {
   const hits = oppCards.filter((c) => c.value === selfCard.value);
-  if (hits.length === 0) { S.miss += 1; S.result = { ok: false, detail: `能力失敗 / ミス: ${S.miss}` }; }
-  else { hits[0].faceUp = true; hits[0].openedByMatch = true; S.result = { ok: true, detail: `能力成功: ${fmt(hits[0].value)} をオープン` }; }
+  if (hits.length === 0) {
+    S.miss += 1;
+    const nonRed = oppCards.filter((c)=>kind(c.value)!=='red');
+    if (nonRed.length === 1) markMissHint(nonRed[0]);
+    else if (nonRed.length === 2) {
+      S.pendingAbilityMiss = oppCards;
+      S.overlay = { type: 'abilityMissChoice' };
+      return;
+    }
+    S.result = { ok: false, detail: `能力失敗 / ミス: ${S.miss}` };
+  } else {
+    hits[0].faceUp = true; hits[0].openedByMatch = true;
+    S.result = { ok: true, detail: `能力成功: ${fmt(hits[0].value)} をオープン` };
+  }
   S.abilityUsed[S.current] = true;
   S.overlay = { type: 'result' };
   checkWinLose();
 }
 
-function renderCard(c, { hidden, hint = false, told = false, oppOpen = false, selfOpen = false, selectable = false, label = '' } = {}) {
-  return `<div class="card ${hidden ? 'back' : 'front ' + kind(c.value)} ${oppOpen ? 'open-opponent' : ''} ${selfOpen ? 'open-self' : ''} ${selectable ? 'selectable' : ''}" data-id="${c.id}">${hidden ? '' : fmt(c.value)}${hint ? `<span class="badge hint">HINT</span><span class="label">${label}</span>` : ''}${told ? '<span class="badge">伝</span>' : ''}</div>`;
+function renderCard(c, { hidden, hint = false, told = false, oppOpen = false, selfOpen = false, selectable = false, selected=false, label = '' } = {}) {
+  return `<div class="card ${hidden ? 'back' : 'front ' + kind(c.value)} ${oppOpen ? 'open-opponent' : ''} ${selfOpen ? 'open-self' : ''} ${selectable ? 'selectable' : ''} ${selected ? 'selected-card' : ''}" data-id="${c.id}">${hidden ? '' : fmt(c.value)}${hint ? `<span class="badge hint">HINT</span><span class="label">${label}</span>` : ''}${told ? '<span class="badge">伝</span>' : ''}${hidden && c.revealedHint ? `<span class="label">${c.revealedHint}</span>`:''}</div>`;
+}
+
+
+function markMissHint(card){
+  if (kind(card.value)==='yellow') card.revealedHint='黄';
+  else if (kind(card.value)==='number') card.revealedHint=String(card.value);
 }
 
 function onCard(id) {
@@ -178,6 +197,8 @@ const actions = {
   setAbility() { S.action = 'ability'; S.selectedSelf = null; S.selectedOpp = []; render(); },
   setYellow(v) { S.yellowCount = v; render(); },
   setRed(v) { S.redCount = v; render(); },
+  abilityMiss0(){ if(S.pendingAbilityMiss?.[0]) markMissHint(S.pendingAbilityMiss[0]); S.pendingAbilityMiss=null; S.abilityUsed[S.current]=true; S.result={ok:false,detail:`能力失敗 / ミス: ${S.miss}`}; S.overlay={type:'result'}; checkWinLose(); render();},
+  abilityMiss1(){ if(S.pendingAbilityMiss?.[1]) markMissHint(S.pendingAbilityMiss[1]); S.pendingAbilityMiss=null; S.abilityUsed[S.current]=true; S.result={ok:false,detail:`能力失敗 / ミス: ${S.miss}`}; S.overlay={type:'result'}; checkWinLose(); render();},
 };
 
 function view() {
@@ -198,8 +219,10 @@ function view() {
       <p>合計枚数: ${48 + S.yellowCount + S.redCount}</p><button data-action="start">ヒント開始へ</button></div>`;
   }
 
-  const oppIdx = allOppIndexes(S.current), myIdx = selfIndexes(S.current);
-  const hintFromOpp = S.hints[1 - S.current];
+  const hintPlayer = S.hintPhase;
+  const viewPlayer = S.phase==='hint' ? hintPlayer : S.current;
+  const oppIdx = allOppIndexes(viewPlayer), myIdx = selfIndexes(viewPlayer);
+  const hintFromOpp = S.hints[1 - viewPlayer];
   const currentName = S.playerNames[S.current];
 
   const yList = S.deck.filter((v)=>kind(v)==='yellow').sort((a,b)=>a-b).map(fmt);
@@ -208,10 +231,10 @@ function view() {
   return `<div class="panel special-bar"><b>特殊カード</b><span class="chip yellow-chip">黄 ${yList.join(' / ') || '-'}</span><span class="chip red-chip">赤 ${rList.join(' / ') || '-'}</span></div>
     <div class="panel">相手ヒント: ${hintFromOpp ? `スタンド${hintFromOpp.stand}の『${hintFromOpp.value}』` : '(未設定)'}</div>
     <div class="panel row">現在: ${currentName} / ターン: ${S.turn} / ミス:${'<span class="dot on"></span>'.repeat(S.miss)}${'<span class="dot"></span>'.repeat(2 - S.miss)} / 能力:${S.abilityUsed[S.current] ? '使用済' : '残1回'} / アクション:${S.action}</div>
-    <div class="panel"><h3>相手スタンド1</h3><div class="line">${S.stands[oppIdx[0]].map((c)=>renderCard(c,{hidden:!c.faceUp,hint:S.hints[1-S.current]?.id===c.id&&!c.faceUp,label:S.hints[1-S.current]?.value,oppOpen:c.faceUp&&c.openedByMatch})).join('')}</div></div>
-    <div class="panel"><h3>相手スタンド2</h3><div class="line">${S.stands[oppIdx[1]].map((c)=>renderCard(c,{hidden:!c.faceUp,hint:S.hints[1-S.current]?.id===c.id&&!c.faceUp,label:S.hints[1-S.current]?.value,oppOpen:c.faceUp&&c.openedByMatch})).join('')}</div></div>
-    <div class="panel"><h3>自分スタンド1</h3><div class="line">${S.stands[myIdx[0]].map((c)=>renderCard(c,{hidden:false,told:c.told,selfOpen:c.faceUp,selectable:S.action==='bulk'&&canBulk(c)})).join('')}</div></div>
-    <div class="panel"><h3>自分スタンド2</h3><div class="line">${S.stands[myIdx[1]].map((c)=>renderCard(c,{hidden:false,told:c.told,selfOpen:c.faceUp,selectable:S.action==='bulk'&&canBulk(c)})).join('')}</div></div>
+    <div class="panel"><h3>"${S.playerNames[oppIdx[0] < 2 ? 0 : 1]}"さんのスタンド①</h3><div class="line">${S.stands[oppIdx[0]].map((c)=>renderCard(c,{hidden:S.phase==='hint'?true:!c.faceUp,hint:S.hints[1-viewPlayer]?.id===c.id&&!(S.phase==='hint'?true:!c.faceUp),label:S.hints[1-viewPlayer]?.value,oppOpen:c.faceUp&&c.openedByMatch,selected:S.selectedOpp.some(x=>x.id===c.id)})).join('')}</div></div>
+    <div class="panel"><h3>"${S.playerNames[oppIdx[1] < 2 ? 0 : 1]}"さんのスタンド②</h3><div class="line">${S.stands[oppIdx[1]].map((c)=>renderCard(c,{hidden:S.phase==='hint'?true:!c.faceUp,hint:S.hints[1-viewPlayer]?.id===c.id&&!(S.phase==='hint'?true:!c.faceUp),label:S.hints[1-viewPlayer]?.value,oppOpen:c.faceUp&&c.openedByMatch,selected:S.selectedOpp.some(x=>x.id===c.id)})).join('')}</div></div>
+    <div class="panel"><h3>"${S.playerNames[myIdx[0] < 2 ? 0 : 1]}"さんのスタンド①</h3><div class="line">${S.stands[myIdx[0]].map((c)=>renderCard(c,{hidden:false,told:c.told,selfOpen:c.faceUp,selectable:S.action==='bulk'&&canBulk(c),selected:S.selectedSelf?.id===c.id})).join('')}</div></div>
+    <div class="panel"><h3>"${S.playerNames[myIdx[1] < 2 ? 0 : 1]}"さんのスタンド②</h3><div class="line">${S.stands[myIdx[1]].map((c)=>renderCard(c,{hidden:false,told:c.told,selfOpen:c.faceUp,selectable:S.action==='bulk'&&canBulk(c),selected:S.selectedSelf?.id===c.id})).join('')}</div></div>
     <div class="panel row"><button class="action-btn ${S.action==='normal'?'active':''}" data-action="setNormal">通常宣言</button><button class="action-btn ${S.action==='bulk'?'active':''}" data-action="setBulk">一括オープン</button><button class="action-btn ${S.action==='ability'?'active':''}" data-action="setAbility" ${S.abilityUsed[S.current] ? 'disabled' : ''}>特殊能力</button><span class="small">選択: 自:${S.selectedSelf ? fmt(S.selectedSelf.value) : '-'} 相:${S.selectedOpp.map((c)=>fmt(c.value)).join('/') || '-'} / ${S.action==='bulk'?'自分スタンドの開きたいカードを1枚選択':''}</span></div>`;
 }
 
@@ -233,6 +256,7 @@ function render() {
     const o = document.createElement('div');
     o.className = 'overlay' + (S.overlay.type === 'swap' ? ' blackout' : '');
     if (S.overlay.type === 'swap') o.innerHTML = `<div class="modal"><div class="big">プレイヤー交代</div><p><b>"${S.playerNames[S.overlay.nextPlayer]}さん"のターンです。</b></p><p>${S.overlay.message}</p><button data-action="closeOverlay">OK</button></div>`;
+    if (S.overlay.type === 'abilityMissChoice') o.innerHTML = `<div class="modal"><h3>能力失敗：公開ヒントを選択</h3><p>どちらのカード情報を公開しますか？</p><div class="row"><button data-action="abilityMiss0">${S.pendingAbilityMiss?.[0]? (kind(S.pendingAbilityMiss[0].value)==='yellow'?'黄候補':'数字候補') : ''}</button><button data-action="abilityMiss1">${S.pendingAbilityMiss?.[1]? (kind(S.pendingAbilityMiss[1].value)==='yellow'?'黄候補':'数字候補') : ''}</button></div></div>`;
     if (S.overlay.type === 'confirmHints') o.innerHTML = `<div class="modal"><h3>ヒント確認</h3><p>${S.playerNames[0]}→${S.playerNames[1]}: スタンド${S.hints[0].stand}の『${S.hints[0].value}』</p><p>${S.playerNames[1]}→${S.playerNames[0]}: スタンド${S.hints[1].stand}の『${S.hints[1].value}』</p><button data-action="toPlay">ゲーム開始！</button></div>`;
     if (S.overlay.type === 'result') o.innerHTML = `<div class="modal"><div class="big ${S.result.ok ? 'ok' : 'ng'}">${S.result.ok ? '正解！' : '不正解'}</div><p>${S.result.detail}</p><button data-action="closeOverlay">次へ</button></div>`;
     if (S.overlay.type === 'end') o.innerHTML = `<div class="modal"><div class="big ng">${S.overlay.text}</div><button onclick="location.reload()">リトライ</button></div>`;
