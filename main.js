@@ -101,8 +101,8 @@ function abilityJudge(selfCard, oppCards) {
   checkWinLose();
 }
 
-function renderCard(c, { hidden, hint = false, told = false, oppOpen = false, selfOpen = false, label = '' } = {}) {
-  return `<div class="card ${hidden ? 'back' : 'front ' + kind(c.value)} ${oppOpen ? 'open-opponent' : ''} ${selfOpen ? 'open-self' : ''}" data-id="${c.id}">${hidden ? '' : fmt(c.value)}${hint ? `<span class="badge hint">HINT</span><span class="label">${label}</span>` : ''}${told ? '<span class="badge">伝</span>' : ''}</div>`;
+function renderCard(c, { hidden, hint = false, told = false, oppOpen = false, selfOpen = false, selectable = false, label = '' } = {}) {
+  return `<div class="card ${hidden ? 'back' : 'front ' + kind(c.value)} ${oppOpen ? 'open-opponent' : ''} ${selfOpen ? 'open-self' : ''} ${selectable ? 'selectable' : ''}" data-id="${c.id}">${hidden ? '' : fmt(c.value)}${hint ? `<span class="badge hint">HINT</span><span class="label">${label}</span>` : ''}${told ? '<span class="badge">伝</span>' : ''}</div>`;
 }
 
 function onCard(id) {
@@ -185,7 +185,7 @@ function view() {
     return `<div class="start-screen">
       <div class="logo">
         <div class="logo-main">2人協力パズル</div>
-        <div class="logo-sub">BOMB BUSTERS STYLE</div>
+        <div class="logo-sub">PUZZLE STYLE</div>
       </div>
       <button class="start-btn" data-action="goSetup">スタート</button>
     </div>`;
@@ -210,9 +210,9 @@ function view() {
     <div class="panel row">現在: ${currentName} / ターン: ${S.turn} / ミス:${'<span class="dot on"></span>'.repeat(S.miss)}${'<span class="dot"></span>'.repeat(2 - S.miss)} / 能力:${S.abilityUsed[S.current] ? '使用済' : '残1回'} / アクション:${S.action}</div>
     <div class="panel"><h3>相手スタンド1</h3><div class="line">${S.stands[oppIdx[0]].map((c)=>renderCard(c,{hidden:!c.faceUp,hint:S.hints[1-S.current]?.id===c.id&&!c.faceUp,label:S.hints[1-S.current]?.value,oppOpen:c.faceUp&&c.openedByMatch})).join('')}</div></div>
     <div class="panel"><h3>相手スタンド2</h3><div class="line">${S.stands[oppIdx[1]].map((c)=>renderCard(c,{hidden:!c.faceUp,hint:S.hints[1-S.current]?.id===c.id&&!c.faceUp,label:S.hints[1-S.current]?.value,oppOpen:c.faceUp&&c.openedByMatch})).join('')}</div></div>
-    <div class="panel"><h3>自分スタンド1</h3><div class="line">${S.stands[myIdx[0]].map((c)=>renderCard(c,{hidden:false,told:c.told,selfOpen:c.faceUp})).join('')}</div></div>
-    <div class="panel"><h3>自分スタンド2</h3><div class="line">${S.stands[myIdx[1]].map((c)=>renderCard(c,{hidden:false,told:c.told,selfOpen:c.faceUp})).join('')}</div></div>
-    <div class="panel row"><button data-action="setNormal">通常宣言</button><button data-action="setBulk">一括オープン</button><button data-action="setAbility" ${S.abilityUsed[S.current] ? 'disabled' : ''}>特殊能力</button><span class="small">選択: 自:${S.selectedSelf ? fmt(S.selectedSelf.value) : '-'} 相:${S.selectedOpp.map((c)=>fmt(c.value)).join('/') || '-'}</span></div>`;
+    <div class="panel"><h3>自分スタンド1</h3><div class="line">${S.stands[myIdx[0]].map((c)=>renderCard(c,{hidden:false,told:c.told,selfOpen:c.faceUp,selectable:S.action==='bulk'&&canBulk(c)})).join('')}</div></div>
+    <div class="panel"><h3>自分スタンド2</h3><div class="line">${S.stands[myIdx[1]].map((c)=>renderCard(c,{hidden:false,told:c.told,selfOpen:c.faceUp,selectable:S.action==='bulk'&&canBulk(c)})).join('')}</div></div>
+    <div class="panel row"><button class="action-btn ${S.action==='normal'?'active':''}" data-action="setNormal">通常宣言</button><button class="action-btn ${S.action==='bulk'?'active':''}" data-action="setBulk">一括オープン</button><button class="action-btn ${S.action==='ability'?'active':''}" data-action="setAbility" ${S.abilityUsed[S.current] ? 'disabled' : ''}>特殊能力</button><span class="small">選択: 自:${S.selectedSelf ? fmt(S.selectedSelf.value) : '-'} 相:${S.selectedOpp.map((c)=>fmt(c.value)).join('/') || '-'} / ${S.action==='bulk'?'自分スタンドの開きたいカードを1枚選択':''}</span></div>`;
 }
 
 function render() {
@@ -232,7 +232,7 @@ function render() {
   if (S.overlay) {
     const o = document.createElement('div');
     o.className = 'overlay' + (S.overlay.type === 'swap' ? ' blackout' : '');
-    if (S.overlay.type === 'swap') o.innerHTML = `<div class="modal"><div class="big">プレイヤー交代</div><p><b>${S.playerNames[S.overlay.nextPlayer]}</b></p><p>${S.overlay.message}</p><button data-action="closeOverlay">OK</button></div>`;
+    if (S.overlay.type === 'swap') o.innerHTML = `<div class="modal"><div class="big">プレイヤー交代</div><p><b>${S.playerNames[S.overlay.nextPlayer]}のターンです。</b></p><p>${S.overlay.message}</p><button data-action="closeOverlay">OK</button></div>`;
     if (S.overlay.type === 'confirmHints') o.innerHTML = `<div class="modal"><h3>ヒント確認</h3><p>${S.playerNames[0]}→${S.playerNames[1]}: スタンド${S.hints[0].stand}の『${S.hints[0].value}』</p><p>${S.playerNames[1]}→${S.playerNames[0]}: スタンド${S.hints[1].stand}の『${S.hints[1].value}』</p><button data-action="toPlay">ゲーム開始！</button></div>`;
     if (S.overlay.type === 'result') o.innerHTML = `<div class="modal"><div class="big ${S.result.ok ? 'ok' : 'ng'}">${S.result.ok ? '正解！' : '不正解'}</div><p>${S.result.detail}</p><button data-action="closeOverlay">次へ</button></div>`;
     if (S.overlay.type === 'end') o.innerHTML = `<div class="modal"><div class="big ng">${S.overlay.text}</div><button onclick="location.reload()">リトライ</button></div>`;
