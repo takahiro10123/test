@@ -1,7 +1,7 @@
 const app = document.getElementById('app');
 
 const S = {
-  phase: 'setup', // setup | hint | ready | play
+  phase: 'start', // start | setup | hint | ready | play
   yellowCount: 2,
   redCount: 1,
   playerNames: ['プレイヤー1', 'プレイヤー2'],
@@ -156,6 +156,7 @@ function onCard(id) {
 }
 
 const actions = {
+  goSetup() { S.phase = 'setup'; render(); },
   start() {
     const n1 = document.querySelector('#p1')?.value?.trim();
     const n2 = document.querySelector('#p2')?.value?.trim();
@@ -180,6 +181,16 @@ const actions = {
 };
 
 function view() {
+  if (S.phase === 'start') {
+    return `<div class="start-screen">
+      <div class="logo">
+        <div class="logo-main">2人協力パズル</div>
+        <div class="logo-sub">BOMB BUSTERS STYLE</div>
+      </div>
+      <button class="start-btn" data-action="goSetup">スタート</button>
+    </div>`;
+  }
+
   if (S.phase === 'setup') {
     return `<div class="panel"><h2>初期設定</h2>
       <div class="row"><label>プレイヤー1名 <input id="p1" value="${S.playerNames[0]}" /></label><label>プレイヤー2名 <input id="p2" value="${S.playerNames[1]}" /></label></div>
