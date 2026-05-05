@@ -193,7 +193,7 @@ function view() {
 
   if (S.phase === 'setup') {
     return `<div class="panel"><h2>初期設定</h2>
-      <div class="row"><label>プレイヤー1名 <input id="p1" value="${S.playerNames[0]}" /></label><label>プレイヤー2名 <input id="p2" value="${S.playerNames[1]}" /></label></div>
+      <div class="row"><label>プレイヤー1名 <input id="p1" value="${S.playerNames[0]}" data-name="0" /></label><label>プレイヤー2名 <input id="p2" value="${S.playerNames[1]}" data-name="1" /></label></div>
       <div class="row">黄色:${[0,2,4].map((n)=>`<button data-yellow="${n}" class="secondary ${S.yellowCount===n?'selected':''}">${n}</button>`).join('')} 赤:${[1,2,3,4].map((n)=>`<button data-red="${n}" class="secondary ${S.redCount===n?'selected':''}">${n}</button>`).join('')}</div>
       <p>合計枚数: ${48 + S.yellowCount + S.redCount}</p><button data-action="start">ヒント開始へ</button></div>`;
   }
@@ -217,7 +217,14 @@ function render() {
   document.querySelectorAll('[data-action]').forEach((b) => b.onclick = () => actions[b.dataset.action]());
   document.querySelectorAll('[data-yellow]').forEach((b) => b.onclick = () => actions.setYellow(Number(b.dataset.yellow)));
   document.querySelectorAll('[data-red]').forEach((b) => b.onclick = () => actions.setRed(Number(b.dataset.red)));
+  document.querySelectorAll('[data-name]').forEach((inp) => inp.oninput = (e) => {
+    const idx = Number(e.target.dataset.name);
+    S.playerNames[idx] = e.target.value;
+  });
   document.querySelectorAll('.card').forEach((el) => el.onclick = () => onCard(el.dataset.id));
+
+  const existing = document.querySelector('.overlay');
+  if (existing) existing.remove();
 
   if (S.overlay) {
     const o = document.createElement('div');
