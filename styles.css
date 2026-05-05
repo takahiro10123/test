@@ -31,3 +31,5 @@ input{background:#10172d;color:#fff;border:1px solid #3a4572;border-radius:8px;p
 
 .card.lifted{transform:translateY(-6px)}
 
+
+.card.opened-visible{box-shadow:0 0 0 2px #7fffd488}
