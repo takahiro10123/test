@@ -17,3 +17,9 @@ input{background:#10172d;color:#fff;border:1px solid #3a4572;border-radius:8px;p
 .logo-main{font-size:44px;font-weight:900;letter-spacing:.06em}
 .logo-sub{font-size:14px;color:#ffd866;letter-spacing:.24em;margin-top:6px}
 .start-btn{font-size:26px;padding:14px 34px;border-radius:12px;background:linear-gradient(180deg,#3f74ff,#2351d3);box-shadow:0 8px 20px #14308a66}
+
+.special-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:12px 14px}
+.chip{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:700;letter-spacing:.02em}
+.yellow-chip{background:#4d3e0a;color:#ffdf7a;border:1px solid #8d6e12}
+.red-chip{background:#4d1018;color:#ff9ba8;border:1px solid #8e2333}
+.overlay.blackout{background:#000}

@@ -110,12 +110,12 @@ function onCard(id) {
   if (!hit) return;
 
   if (S.phase === 'hint') {
-    if (selfIndexes(S.hintPhase).includes(hit.si) && kind(hit.c.value) === 'number') {
+    if (allOppIndexes(S.hintPhase).includes(hit.si) && kind(hit.c.value) === 'number') {
       S.hints[S.hintPhase] = { stand: (hit.si % 2) + 1, value: hit.c.value, id: hit.c.id };
       hit.c.told = true;
       if (S.hintPhase === 0) {
         S.hintPhase = 1;
-        S.overlay = { type: 'swap', nextPlayer: 1, message: `${S.playerNames[1]}さん、あなたのカードから数字カード1枚を選び、相手に伝えてください。` };
+        S.overlay = { type: 'swap', nextPlayer: 1, message: `${S.playerNames[1]}さん、相手スタンドから数字カード1枚を選び、相手に伝えてください。` };
       } else {
         S.phase = 'ready';
         S.overlay = { type: 'confirmHints' };
@@ -163,7 +163,7 @@ const actions = {
     S.playerNames = [n1 || 'プレイヤー1', n2 || 'プレイヤー2'];
     deal();
     S.phase = 'hint';
-    S.overlay = { type: 'swap', nextPlayer: 0, message: `${S.playerNames[0]}さん、あなたのカードから数字カード1枚を選び、相手に伝えてください。` };
+    S.overlay = { type: 'swap', nextPlayer: 0, message: `${S.playerNames[0]}さん、相手スタンドから数字カード1枚を選び、相手に伝えてください。` };
     render();
   },
   toPlay() { S.phase = 'play'; S.current = 0; S.overlay = { type: 'swap', nextPlayer: 0, message: `${S.playerNames[0]}さん、ゲーム開始です。行動を選択してください。` }; render(); },
@@ -185,7 +185,7 @@ function view() {
     return `<div class="start-screen">
       <div class="logo">
         <div class="logo-main">2人協力パズル</div>
-        <div class="logo-sub">PUZZLE STYLE</div>
+        <div class="logo-sub">BOMB BUSTERS STYLE</div>
       </div>
       <button class="start-btn" data-action="goSetup">スタート</button>
     </div>`;
@@ -194,7 +194,7 @@ function view() {
   if (S.phase === 'setup') {
     return `<div class="panel"><h2>初期設定</h2>
       <div class="row"><label>プレイヤー1名 <input id="p1" value="${S.playerNames[0]}" data-name="0" /></label><label>プレイヤー2名 <input id="p2" value="${S.playerNames[1]}" data-name="1" /></label></div>
-      <div class="row">黄色:${[0,2,4].map((n)=>`<button data-yellow="${n}" class="secondary ${S.yellowCount===n?'selected':''}">${n}</button>`).join('')} 赤:${[1,2,3,4].map((n)=>`<button data-red="${n}" class="secondary ${S.redCount===n?'selected':''}">${n}</button>`).join('')}</div>
+      <div class="row">黄色:${[0,2,4].map((n)=>`<button data-yellow="${n}" class="secondary ${S.yellowCount===n?'selected':''}">${n}</button>`).join('')} 赤:${[0,1,2,3,4].map((n)=>`<button data-red="${n}" class="secondary ${S.redCount===n?'selected':''}">${n}</button>`).join('')}</div>
       <p>合計枚数: ${48 + S.yellowCount + S.redCount}</p><button data-action="start">ヒント開始へ</button></div>`;
   }
 
@@ -202,7 +202,10 @@ function view() {
   const hintFromOpp = S.hints[1 - S.current];
   const currentName = S.playerNames[S.current];
 
-  return `<div class="panel row"><b>特殊カード</b> 黄:[${S.deck.filter((v)=>kind(v)==='yellow').map(fmt).join(',') || '-'}] 赤:[${S.deck.filter((v)=>kind(v)==='red').map(fmt).join(',')}]</div>
+  const yList = S.deck.filter((v)=>kind(v)==='yellow').sort((a,b)=>a-b).map(fmt);
+  const rList = S.deck.filter((v)=>kind(v)==='red').sort((a,b)=>a-b).map(fmt);
+
+  return `<div class="panel special-bar"><b>特殊カード</b><span class="chip yellow-chip">黄 ${yList.join(' / ') || '-'}</span><span class="chip red-chip">赤 ${rList.join(' / ') || '-'}</span></div>
     <div class="panel">相手ヒント: ${hintFromOpp ? `スタンド${hintFromOpp.stand}の『${hintFromOpp.value}』` : '(未設定)'}</div>
     <div class="panel row">現在: ${currentName} / ターン: ${S.turn} / ミス:${'<span class="dot on"></span>'.repeat(S.miss)}${'<span class="dot"></span>'.repeat(2 - S.miss)} / 能力:${S.abilityUsed[S.current] ? '使用済' : '残1回'} / アクション:${S.action}</div>
     <div class="panel"><h3>相手スタンド1</h3><div class="line">${S.stands[oppIdx[0]].map((c)=>renderCard(c,{hidden:!c.faceUp,hint:S.hints[1-S.current]?.id===c.id&&!c.faceUp,label:S.hints[1-S.current]?.value,oppOpen:c.faceUp&&c.openedByMatch})).join('')}</div></div>
@@ -228,7 +231,7 @@ function render() {
 
   if (S.overlay) {
     const o = document.createElement('div');
-    o.className = 'overlay';
+    o.className = 'overlay' + (S.overlay.type === 'swap' ? ' blackout' : '');
     if (S.overlay.type === 'swap') o.innerHTML = `<div class="modal"><div class="big">プレイヤー交代</div><p><b>${S.playerNames[S.overlay.nextPlayer]}</b></p><p>${S.overlay.message}</p><button data-action="closeOverlay">OK</button></div>`;
     if (S.overlay.type === 'confirmHints') o.innerHTML = `<div class="modal"><h3>ヒント確認</h3><p>${S.playerNames[0]}→${S.playerNames[1]}: スタンド${S.hints[0].stand}の『${S.hints[0].value}』</p><p>${S.playerNames[1]}→${S.playerNames[0]}: スタンド${S.hints[1].stand}の『${S.hints[1].value}』</p><button data-action="toPlay">ゲーム開始！</button></div>`;
     if (S.overlay.type === 'result') o.innerHTML = `<div class="modal"><div class="big ${S.result.ok ? 'ok' : 'ng'}">${S.result.ok ? '正解！' : '不正解'}</div><p>${S.result.detail}</p><button data-action="closeOverlay">次へ</button></div>`;
