@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 520" role="img" aria-labelledby="title desc">
+  <title id="title">Pontaパス会員向け抽選キャンペーンのオリジナルマスコット</title>
+  <desc id="desc">Pontaくんの親しみやすいトーンに合わせた、ポイントを持って笑うたぬき風キャラクターのオリジナルイラスト。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#fff8df" offset="0"/>
+      <stop stop-color="#ffe7a6" offset="1"/>
+    </linearGradient>
+    <linearGradient id="coin" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#ffd85f" offset="0"/>
+      <stop stop-color="#ff9f1c" offset="1"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="16" stdDeviation="15" flood-color="#9a5b00" flood-opacity=".22"/>
+    </filter>
+  </defs>
+  <rect width="640" height="520" rx="56" fill="url(#bg)"/>
+  <g opacity=".26" fill="#ffb31f">
+    <circle cx="80" cy="86" r="16"/><circle cx="558" cy="104" r="22"/><circle cx="546" cy="410" r="12"/>
+    <path d="M117 394c25-14 61-7 80 16-28 15-64 9-80-16Z"/>
+    <path d="M442 52c30 4 50 25 52 55-31-2-53-24-52-55Z"/>
+  </g>
+  <g filter="url(#shadow)">
+    <ellipse cx="320" cy="425" rx="170" ry="36" fill="#d57c14" opacity=".2"/>
+    <path d="M162 297c-49-4-80-39-77-85 35 3 67 24 92 58Z" fill="#8b5a2b"/>
+    <path d="M478 297c49-4 80-39 77-85-35 3-67 24-92 58Z" fill="#8b5a2b"/>
+    <path d="M151 184c-17-75 38-129 98-93 19-41 119-45 143 0 61-37 115 17 98 93 41 33 65 84 65 143 0 103-88 153-235 153s-235-50-235-153c0-59 25-110 66-143Z" fill="#c8843b"/>
+    <path d="M180 190c-24-52 14-91 55-64-18 14-31 34-37 60Z" fill="#5b3a1f" opacity=".92"/>
+    <path d="M460 190c24-52-14-91-55-64 18 14 31 34 37 60Z" fill="#5b3a1f" opacity=".92"/>
+    <path d="M168 262c33-61 84-93 152-93s119 32 152 93c24 44 17 105-17 143-37 42-86 54-135 54s-98-12-135-54c-34-38-41-99-17-143Z" fill="#f3c46e"/>
+    <path d="M201 282c16-47 53-73 91-69 12 2 23 10 29 22 6-12 17-20 29-22 38-4 75 22 91 69-35 14-79 5-120-24-41 29-85 38-120 24Z" fill="#4c2f1e"/>
+    <circle cx="252" cy="285" r="15" fill="#111"/><circle cx="388" cy="285" r="15" fill="#111"/>
+    <circle cx="258" cy="279" r="5" fill="#fff"/><circle cx="394" cy="279" r="5" fill="#fff"/>
+    <path d="M309 312c8-8 14-8 22 0-2 11-7 17-11 17s-9-6-11-17Z" fill="#3a2319"/>
+    <path d="M282 346c26 31 53 31 79 0" fill="none" stroke="#3a2319" stroke-width="10" stroke-linecap="round"/>
+    <path d="M151 383c-22 48 21 83 67 46 6 38 45 62 102 62s96-24 102-62c46 37 89 2 67-46-26 40-80 57-169 57s-143-17-169-57Z" fill="#8b5a2b"/>
+    <path d="M226 94c13-47 71-66 94-20 25-46 84-27 96 20-45-9-95-9-190 0Z" fill="#ff8a00"/>
+    <path d="M220 102c51-17 148-17 200 0" fill="none" stroke="#fff2bd" stroke-width="14" stroke-linecap="round"/>
+    <g transform="translate(438 316) rotate(-10)">
+      <circle cx="0" cy="0" r="64" fill="url(#coin)" stroke="#fff3b3" stroke-width="10"/>
+      <text x="0" y="18" text-anchor="middle" font-family="Arial, sans-serif" font-size="56" font-weight="900" fill="#8a4c00">P</text>
+    </g>
+    <g transform="translate(123 321) rotate(9)">
+      <rect x="0" y="0" width="154" height="82" rx="22" fill="#27a64d" stroke="#fff" stroke-width="8"/>
+      <text x="77" y="34" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" font-weight="900" fill="#fff">Ponta</text>
+      <text x="77" y="62" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="900" fill="#fff4b8">PASS</text>
+    </g>
+  </g>
+</svg>

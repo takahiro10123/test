@@ -3,11 +3,108 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>2人協力パズル</title>
+  <meta name="description" content="Pontaパス会員限定。Pontaポイントが抽選で当たるキャンペーンLPです。" />
+  <title>Pontaパス会員限定｜Pontaポイント抽選キャンペーン</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div id="app"></div>
+  <header class="site-header" aria-label="キャンペーンヘッダー">
+    <a class="brand" href="#top" aria-label="Pontaポイント抽選キャンペーン トップへ">
+      <span class="brand-mark">P</span>
+      <span>Pontaポイント抽選</span>
+    </a>
+    <nav class="header-nav" aria-label="ページ内ナビゲーション">
+      <a href="#prizes">賞品</a>
+      <a href="#condition">抽選条件</a>
+      <a href="#entry">応募</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero section-shell">
+      <div class="hero-copy">
+        <p class="eyebrow">Pontaパス会員限定キャンペーン</p>
+        <h1>毎日のワクワクに、<br><span>Pontaポイント</span>をプラス。</h1>
+        <p class="lead">Pontaパス会員ならエントリーOK。抽選でPontaポイントをプレゼントする、ぽかぽか楽しいキャンペーンLPです。</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#entry">今すぐ応募する</a>
+          <a class="button secondary" href="#condition">条件を確認</a>
+        </div>
+        <ul class="hero-notes" aria-label="キャンペーン概要">
+          <li>抽選条件：Pontaパス会員であること</li>
+          <li>参加費無料・スマホからかんたん応募</li>
+        </ul>
+      </div>
+      <div class="hero-art" aria-label="Pontaくんのトンマナに合わせたオリジナル生成イラスト">
+        <img src="assets/ponta-pass-mascot.svg" alt="ポイントコインを持ったたぬき風マスコットのキャンペーンイラスト" />
+        <div class="point-bubble">最大<br><strong>10,000</strong><small>ポイント</small></div>
+      </div>
+    </section>
+
+    <section id="prizes" class="prize-band">
+      <div class="section-shell prize-grid">
+        <article class="prize-card main-prize">
+          <span class="card-label">1等</span>
+          <h2>10,000 Pontaポイント</h2>
+          <p>お買い物や日常のご利用に使えるPontaポイントをどーんとプレゼント。</p>
+        </article>
+        <article class="prize-card">
+          <span class="card-label">2等</span>
+          <h2>1,000ポイント</h2>
+          <p>ちょっとしたご褒美にぴったり。</p>
+        </article>
+        <article class="prize-card">
+          <span class="card-label">Wチャンス</span>
+          <h2>100ポイント</h2>
+          <p>はずれてもチャンスが続く、うれしい抽選枠。</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="condition" class="section-shell info-section">
+      <div class="section-heading">
+        <p class="eyebrow">Entry condition</p>
+        <h2>抽選条件はひとつだけ</h2>
+      </div>
+      <div class="condition-card">
+        <div class="check-icon" aria-hidden="true">✓</div>
+        <div>
+          <h3>Pontaパス会員であること</h3>
+          <p>応募時点でPontaパス会員の方が抽選対象です。会員状態を確認してからエントリーしてください。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-shell steps-section" aria-labelledby="steps-title">
+      <div class="section-heading">
+        <p class="eyebrow">How to join</p>
+        <h2 id="steps-title">応募は3ステップ</h2>
+      </div>
+      <ol class="steps">
+        <li><span>1</span><strong>Pontaパスへログイン</strong><p>会員アカウントでログインします。</p></li>
+        <li><span>2</span><strong>応募ボタンをタップ</strong><p>キャンペーン内容を確認してエントリー。</p></li>
+        <li><span>3</span><strong>抽選結果を待つ</strong><p>当選ポイントは後日進呈予定です。</p></li>
+      </ol>
+    </section>
+
+    <section id="entry" class="entry section-shell">
+      <div>
+        <p class="eyebrow">Lucky chance</p>
+        <h2>さあ、Pontaポイントを当てにいこう。</h2>
+        <p>あたたかいオレンジとグリーンを基調に、Pontaくんらしい親しみやすさを意識したキャンペーン体験です。</p>
+      </div>
+      <a class="button primary large" href="https://pass.auone.jp/" target="_blank" rel="noreferrer">Pontaパス会員として応募する</a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© Pontaポイント抽選キャンペーン Sample LP</p>
+    <p class="fine-print">本ページはLP制作サンプルです。キャンペーン詳細・進呈条件は公式案内をご確認ください。</p>
+  </footer>
+
   <script src="main.js"></script>
 </body>
 </html>
